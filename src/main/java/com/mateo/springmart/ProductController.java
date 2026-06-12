@@ -3,11 +3,10 @@ package com.mateo.springmart;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.ArrayList;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/products")
 public class ProductController {
     private final ArrayList<Product> products = new ArrayList<>();
 
@@ -22,9 +21,13 @@ public class ProductController {
         products.add(new Product(counter.incrementAndGet(), "Soap", 4.99, 100, "Personal Care"));
     }
 
-    @GetMapping("/products")
+    @GetMapping
     public ArrayList<Product> products(){
         return products;
     }
 
+    @GetMapping("/{id}")
+    public Product getProductById(@PathVariable long id){
+        return products.stream().filter(p -> p.id() == id).findFirst().orElse(null);
+    }
 }
