@@ -1,33 +1,25 @@
 package com.mateo.springmart;
 
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
-    private final ArrayList<Product> products = new ArrayList<>();
+    private final ProductRepository productRepository;
 
-    public ProductController() {
-        AtomicLong counter = new AtomicLong();
-        products.add(new Product(counter.incrementAndGet(), "Apple", 12.99, 100, "Grocery"));
-        products.add(new Product(counter.incrementAndGet(), "Banana", 12.99, 100, "Grocery"));
-        products.add(new Product(counter.incrementAndGet(), "Orange", 12.99, 100, "Grocery"));
-        products.add(new Product(counter.incrementAndGet(), "Laptop", 500.00, 10, "Electronics"));
-        products.add(new Product(counter.incrementAndGet(), "Tv", 299.99, 20, "Electronics"));
-        products.add(new Product(counter.incrementAndGet(), "Shampoo", 10.00, 100, "Personal Care"));
-        products.add(new Product(counter.incrementAndGet(), "Soap", 4.99, 100, "Personal Care"));
+    public ProductController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     @GetMapping
-    public ArrayList<Product> products(){
-        return products;
+    public List<Product> index(){
+        return productRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable long id){
-        return products.stream().filter(p -> p.id() == id).findFirst().orElse(null);
+        return productRepository.findById(id).orElseThrow(()->new RuntimeException("Product with ID: " + id + " not found."));
     }
 }
