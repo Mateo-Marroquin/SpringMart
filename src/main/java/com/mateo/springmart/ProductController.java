@@ -44,6 +44,31 @@ public class ProductController {
                 });
     }
 
+    @PatchMapping("/{id}")
+    public Product partialUpdateProduct(@RequestBody Product newData, @PathVariable Long id) {
+        return productRepository.findById(id)
+                .map(existingProduct -> {
+                    if (newData.getName() != null) {
+                        existingProduct.setName(newData.getName());
+                    }
+
+                    if (newData.getPrice() != null && newData.getPrice() > 0) {
+                        existingProduct.setPrice(newData.getPrice());
+                    }
+
+                    if (newData.getStock() != null && newData.getStock() >= 0) {
+                        existingProduct.setStock(newData.getStock());
+                    }
+
+                    if (newData.getArea() != null) {
+                        existingProduct.setArea(newData.getArea());
+                    }
+
+                    return productRepository.save(existingProduct);
+                })
+                .orElseThrow(() -> new RuntimeException("Product with ID: " + id + " not found to modify."));
+    }
+
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id) {
         productRepository.deleteById(id);
